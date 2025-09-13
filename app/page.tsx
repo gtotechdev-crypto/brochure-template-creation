@@ -178,7 +178,16 @@ export default function HomePage() {
 
   const handleExport = async (options: ExportOptions) => {
     try {
-      await PDFGenerator.exportBrochure(brochureData, options)
+      if (options.pages && options.pages.length === 1) {
+        const pageIndex = options.pages[0] - 1
+        const singlePageData = {
+          ...brochureData,
+          sections: [visibleSections[pageIndex]],
+        }
+        await PDFGenerator.exportBrochure(singlePageData, { ...options, pages: undefined })
+      } else {
+        await PDFGenerator.exportBrochure(brochureData, options)
+      }
     } catch (error) {
       console.error("Export failed:", error)
       alert("Export failed. Please try again.")
@@ -401,7 +410,8 @@ export default function HomePage() {
                         className="w-full"
                         size="sm"
                       >
-                        Export Current Page Only
+                        <FileDown className="h-4 w-4 mr-2" />
+                        Export Page {currentPage + 1} Only
                       </Button>
                     </div>
                   </div>
